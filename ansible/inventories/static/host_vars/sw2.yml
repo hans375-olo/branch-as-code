@@ -1,0 +1,39 @@
+# Static SoT data for sw2 — mirrors the NetBox model 1:1.
+sot_source: static-yaml
+
+device:
+  name: sw2
+  role: access-switch
+  platform: eos
+
+vlans:
+  - { vid: 10, name: MGMT }
+  - { vid: 20, name: STAFF }
+  - { vid: 30, name: GUEST }
+  - { vid: 40, name: POS }
+
+interfaces:
+  - name: Ethernet2
+    description: TRUNK-sw1
+    mode: tagged
+    untagged_vlan: ~
+    tagged_vlans: [10, 20, 30, 40]
+    ips: []
+  - name: Ethernet3
+    description: ACCESS-host-guest
+    mode: access
+    untagged_vlan: 30
+    tagged_vlans: []
+    ips: []
+  - name: Ethernet4
+    description: ACCESS-host-pos
+    mode: access
+    untagged_vlan: 40
+    tagged_vlans: []
+    ips: []
+  - name: Vlan10
+    description: SVI MGMT
+    mode: ~
+    untagged_vlan: ~
+    tagged_vlans: []
+    ips: ["10.{{ store_id }}.0.3/24"]

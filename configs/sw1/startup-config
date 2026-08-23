@@ -1,0 +1,46 @@
+! ============================================================
+! Golden config: sw1 (dist-switch / eos)
+! Rendered by branch-as-code from static-yaml
+! Site: branch-001 — store_id 1
+! Do not edit by hand: change the data, re-render, redeploy.
+! ============================================================
+hostname sw1
+!
+username admin privilege 15 secret admin
+!
+spanning-tree mode mstp
+!
+vlan 10
+   name MGMT
+vlan 20
+   name STAFF
+vlan 30
+   name GUEST
+vlan 40
+   name POS
+!
+ip routing
+!
+interface Ethernet1
+   description UPLINK-rtr1-edge   no switchport   ip address 10.1.255.0/31!
+interface Ethernet2
+   description TRUNK-sw2   switchport mode trunk
+   switchport trunk allowed vlan 10,20,30,40!
+interface Ethernet3
+   description ACCESS-host-staff   switchport mode access
+   switchport access vlan 20!
+interface Vlan10
+   description SVI MGMT   ip address 10.1.0.1/24!
+interface Vlan20
+   description SVI STAFF   ip address 10.1.1.1/24!
+interface Vlan30
+   description SVI GUEST   ip address 10.1.2.1/24!
+interface Vlan40
+   description SVI POS   ip address 10.1.3.1/24!
+ip route 0.0.0.0/0 10.1.255.1
+!
+management api http-commands
+   protocol http
+   no shutdown
+!
+end

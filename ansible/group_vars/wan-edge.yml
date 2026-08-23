@@ -1,0 +1,14 @@
+# Routing policy for the store edge — deliberately NOT in NetBox.
+# SoT owns topology and IPAM; policy vars own routing design.
+bgp:
+  asn: "{{ 65000 + store_id }}"
+  router_id: "10.255.{{ store_id }}.1"
+  redistribute_static: true
+  neighbors:
+    - ip: 100.64.1.0
+      asn: 65000
+      description: hq-core
+
+static_routes:
+  - prefix: "10.{{ store_id }}.0.0/20"
+    nexthop: "10.{{ store_id }}.255.0"

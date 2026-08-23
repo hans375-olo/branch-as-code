@@ -1,0 +1,29 @@
+# Static SoT data for rtr1-edge — mirrors the NetBox model 1:1.
+sot_source: static-yaml
+
+device:
+  name: rtr1-edge
+  role: wan-edge
+  platform: frr
+
+vlans: []   # routing-only device
+
+interfaces:
+  - name: lo
+    description: Loopback / router-id
+    mode: ~
+    untagged_vlan: ~
+    tagged_vlans: []
+    ips: ["10.255.{{ store_id }}.1/32"]
+  - name: eth1
+    description: WAN to hq-core
+    mode: ~
+    untagged_vlan: ~
+    tagged_vlans: []
+    ips: ["100.64.1.1/31"]
+  - name: eth2
+    description: Routed handoff to sw1
+    mode: ~
+    untagged_vlan: ~
+    tagged_vlans: []
+    ips: ["10.{{ store_id }}.255.1/31"]

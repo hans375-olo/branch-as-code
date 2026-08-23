@@ -1,0 +1,3 @@
+# FRR has no SSH/API — configs are rendered into the bind-mounted file
+# and applied with `vtysh -b` via docker exec (see deploy.yml).
+ansible_connection: local

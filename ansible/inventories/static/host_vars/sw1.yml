@@ -1,0 +1,57 @@
+# Static SoT data for sw1 — mirrors the NetBox model 1:1.
+sot_source: static-yaml
+
+device:
+  name: sw1
+  role: dist-switch
+  platform: eos
+
+vlans:
+  - { vid: 10, name: MGMT }
+  - { vid: 20, name: STAFF }
+  - { vid: 30, name: GUEST }
+  - { vid: 40, name: POS }
+
+interfaces:
+  - name: Ethernet1
+    description: UPLINK-rtr1-edge
+    mode: ~
+    untagged_vlan: ~
+    tagged_vlans: []
+    ips: ["10.{{ store_id }}.255.0/31"]
+  - name: Ethernet2
+    description: TRUNK-sw2
+    mode: tagged
+    untagged_vlan: ~
+    tagged_vlans: [10, 20, 30, 40]
+    ips: []
+  - name: Ethernet3
+    description: ACCESS-host-staff
+    mode: access
+    untagged_vlan: 20
+    tagged_vlans: []
+    ips: []
+  - name: Vlan10
+    description: SVI MGMT
+    mode: ~
+    untagged_vlan: ~
+    tagged_vlans: []
+    ips: ["10.{{ store_id }}.0.1/24"]
+  - name: Vlan20
+    description: SVI STAFF
+    mode: ~
+    untagged_vlan: ~
+    tagged_vlans: []
+    ips: ["10.{{ store_id }}.1.1/24"]
+  - name: Vlan30
+    description: SVI GUEST
+    mode: ~
+    untagged_vlan: ~
+    tagged_vlans: []
+    ips: ["10.{{ store_id }}.2.1/24"]
+  - name: Vlan40
+    description: SVI POS
+    mode: ~
+    untagged_vlan: ~
+    tagged_vlans: []
+    ips: ["10.{{ store_id }}.3.1/24"]

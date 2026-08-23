@@ -1,0 +1,41 @@
+! ============================================================
+! Golden config: sw2 (access-switch / eos)
+! Rendered by branch-as-code from static-yaml
+! Site: branch-001 — store_id 1
+! Do not edit by hand: change the data, re-render, redeploy.
+! ============================================================
+hostname sw2
+!
+username admin privilege 15 secret admin
+!
+spanning-tree mode mstp
+!
+vlan 10
+   name MGMT
+vlan 20
+   name STAFF
+vlan 30
+   name GUEST
+vlan 40
+   name POS
+!
+ip routing
+!
+interface Ethernet2
+   description TRUNK-sw1   switchport mode trunk
+   switchport trunk allowed vlan 10,20,30,40!
+interface Ethernet3
+   description ACCESS-host-guest   switchport mode access
+   switchport access vlan 30!
+interface Ethernet4
+   description ACCESS-host-pos   switchport mode access
+   switchport access vlan 40!
+interface Vlan10
+   description SVI MGMT   ip address 10.1.0.3/24!
+ip route 0.0.0.0/0 10.1.0.1
+!
+management api http-commands
+   protocol http
+   no shutdown
+!
+end

@@ -1,0 +1,42 @@
+! ============================================================
+! Golden config: {{ device.name }} ({{ device.role }} / {{ device.platform }})
+! Rendered by branch-as-code from {{ sot_source | default('netbox') }}
+! Routing policy (BGP/ASN/statics) comes from group_vars — the SoT
+! owns topology and IPAM, vars own routing design.
+! ============================================================
+frr version 10.2
+frr defaults traditional
+hostname {{ device.name }}
+log stdout
+service integrated-vtysh-config
+!
+{% for i in interfaces %}
+interface {{ i.name }}
+ description {{ i.description | default('') }}
+{% for ip in i.ips | default([]) %}
+ ip address {{ ip }}
+{% endfor %}
+!
+{% endfor %}
+{% for r in static_routes | default([]) %}
+ip route {{ r.prefix }} {{ r.nexthop }}
+{% endfor %}
+!
+{% if bgp is defined %}
+router bgp {{ bgp.asn }}
+ bgp router-id {{ bgp.router_id }}
+ no bgp ebgp-requires-policy
+{% for n in bgp.neighbors | default([]) %}
+ neighbor {{ n.ip }} remote-as {{ n.asn }}
+ neighbor {{ n.ip }} description {{ n.description | default('') }}
+{% endfor %}
+ address-family ipv4 unicast
+{% for net in bgp.networks | default([]) %}
+  network {{ net }}
+{% endfor %}
+{% if bgp.redistribute_static | default(false) %}
+  redistribute static
+{% endif %}
+ exit-address-family
+!
+{% endif %}

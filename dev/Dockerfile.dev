@@ -1,0 +1,53 @@
+# General-purpose network-automation workstation container:
+# code-server (VS Code in the browser) + Python + Ansible + pyATS/Genie
+# + containerlab + Docker CLI.
+#
+# Architecture: this container is the CONTROL PLANE. It has no docker
+# daemon of its own — it drives the VM's dockerd through the mounted
+# socket, so containers it creates are siblings, not children.
+#
+# Deliberately runs as root: single-user lab VM, and it sidesteps the
+# docker-socket GID-matching dance. Hardening (non-root user + group
+# mapping) is a roadmap item, not a lab requirement.
+FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PIP_BREAK_SYSTEM_PACKAGES=1
+
+# Base tooling + Python build deps (pyATS/Genie compile some wheels)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      ca-certificates curl git openssh-client sshpass \
+      python3 python3-pip python3-venv python3-dev build-essential \
+      iputils-ping iproute2 dnsutils traceroute jq less vim-tiny sudo \
+    && rm -rf /var/lib/apt/lists/*
+
+# Docker CLI + compose plugin (client only — the daemon lives on the VM)
+RUN install -m 0755 -d /etc/apt/keyrings \
+ && curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
+      -o /etc/apt/keyrings/docker.asc \
+ && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] \
+      https://download.docker.com/linux/ubuntu noble stable" \
+      > /etc/apt/sources.list.d/docker.list \
+ && apt-get update \
+ && apt-get install -y --no-install-recommends docker-ce-cli docker-compose-plugin \
+ && rm -rf /var/lib/apt/lists/*
+
+# containerlab — works against the mounted docker socket
+RUN curl -sL https://get.containerlab.dev | bash
+
+# code-server — VS Code in the browser
+RUN curl -fsSL https://code-server.dev/install.sh | sh
+
+# Python network-automation toolchain
+RUN pip3 install --no-cache-dir \
+      ansible ansible-lint \
+      pynetbox netaddr jinja2 \
+      "pyats[full]" \
+      rich
+
+COPY dev/entrypoint.sh /usr/local/bin/dev-entrypoint.sh
+RUN chmod +x /usr/local/bin/dev-entrypoint.sh
+
+EXPOSE 8080
+WORKDIR /opt/branch-as-code
+ENTRYPOINT ["dev-entrypoint.sh"]

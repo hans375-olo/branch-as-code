@@ -1,0 +1,78 @@
+---
+# Render golden configs from the Source of Truth.
+#
+#   ansible-playbook render.yml                              # static YAML SoT
+#   ansible-playbook -i inventories/netbox.yml render.yml    # NetBox SoT
+#
+# Output lands in ../configs/<node>/ — the same files the containerlab
+# topology bind-mounts. Render -> redeploy = GitOps-lite.
+
+- name: Render golden configs
+  hosts: wan-edge:dist-switch:access-switch
+  gather_facts: false
+
+  tasks:
+    # ---------- NetBox path: build the normalized contract ---------------
+    - name: Pull device data from NetBox
+      when: sot_source == 'netbox'
+      delegate_to: localhost
+      ansible.builtin.set_fact:
+        nb_ifaces: >-
+          {{ lookup('netbox.netbox.nb_lookup', 'dcim/interfaces',
+                    api_endpoint=netbox_url, token=netbox_token,
+                    validate_certs=false, raw_data=true,
+                    api_filter='device=' + inventory_hostname) }}
+        nb_ips: >-
+          {{ lookup('netbox.netbox.nb_lookup', 'ipam/ip-addresses',
+                    api_endpoint=netbox_url, token=netbox_token,
+                    validate_certs=false, raw_data=true,
+                    api_filter='device=' + inventory_hostname) }}
+        nb_vlans: >-
+          {{ lookup('netbox.netbox.nb_lookup', 'ipam/vlans',
+                    api_endpoint=netbox_url, token=netbox_token,
+                    validate_certs=false, raw_data=true,
+                    api_filter=('group=store-%03d-vlans' | format(store_id | int))) }}
+
+    - name: Normalize NetBox data into the template contract
+      when: sot_source == 'netbox'
+      ansible.builtin.set_fact:
+        device:
+          name: "{{ inventory_hostname }}"
+          role: "{{ group_names | intersect(['wan-edge', 'dist-switch', 'access-switch']) | first }}"
+          platform: "{{ group_names | intersect(['eos', 'frr']) | first }}"
+        vlans: "{{ nb_vlans | json_query('[].{vid: vid, name: name}') }}"
+        # NOTE: one IP per interface in the current data model — extend to
+        # a list if you add secondaries/HSRP.
+        ips_by_iface: >-
+          {{ nb_ips | json_query('[].[assigned_object_id, address]')
+                    | ansible.builtin.dict }}
+        interfaces_base: >-
+          {{ nb_ifaces
+             | json_query('sort_by([], &name)[].{
+                 id: id,
+                 name: name,
+                 description: description,
+                 mode: mode.value,
+                 untagged_vlan: untagged_vlan.vid,
+                 tagged_vlans: tagged_vlans[].vid}')
+             | list }}
+
+    - name: Attach IPs to their interfaces
+      when: sot_source == 'netbox'
+      ansible.builtin.set_fact:
+        interfaces: >-
+          {{ interfaces | default([]) +
+             [item | combine({'ips': ips_by_iface.get(item.id, []) | ansible.builtin.wrap_list})] }}
+      loop: "{{ interfaces_base }}"
+
+    # ---------- Both paths converge here ---------------------------------
+    - name: Render {{ device.platform }} golden config
+      delegate_to: localhost
+      ansible.builtin.template:
+        src: "{{ playbook_dir }}/../templates/{{ device.platform }}.j2"
+        dest: "{{ configs_dir }}/{{ inventory_hostname }}/{{ 'startup-config' if device.platform == 'eos' else 'frr.conf' }}"
+        mode: "0644"
+
+    - name: Show rendered file
+      ansible.builtin.debug:
+        msg: "{{ configs_dir }}/{{ inventory_hostname }}/ rendered from {{ sot_source }}"

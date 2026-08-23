@@ -1,0 +1,3 @@
+# L3 distribution switch: gateway of last resort is the store edge router
+# (far end of the 10.<store>.255.0/31 transit).
+default_gateway: "10.{{ store_id }}.255.1"

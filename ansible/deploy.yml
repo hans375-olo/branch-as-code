@@ -1,0 +1,30 @@
+---
+# Deploy rendered configs to the lab.
+#
+#   ansible-playbook deploy.yml            (inventory per ansible.cfg / -i)
+
+- name: Deploy to EOS switches over eAPI
+  hosts: eos
+  gather_facts: false
+  tasks:
+    - name: Push golden config (full replace, with backup)
+      arista.eos.eos_config:
+        src: "{{ configs_dir }}/{{ inventory_hostname }}/startup-config"
+        replace: config
+        backup: true
+      register: pushed
+
+    - name: Diff applied
+      ansible.builtin.debug:
+        var: pushed.updates
+
+
+- name: Deploy to FRR routers (bind-mounted config + vtysh reload)
+  hosts: wan-edge
+  gather_facts: false
+  tasks:
+    - name: Apply rendered frr.conf
+      delegate_to: localhost
+      ansible.builtin.command: >-
+        docker exec clab-branch-001-{{ inventory_hostname }} vtysh -b
+      changed_when: true

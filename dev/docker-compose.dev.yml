@@ -1,0 +1,32 @@
+# The workstation container. Run from the repo root:
+#   docker compose -f dev/docker-compose.dev.yml up -d --build
+# then browse to http://<vm-ip>:8443
+#
+# IMPORTANT — the docker-in-docker path rule:
+# containerlab turns relative bind paths (e.g. ../configs/sw1/...) into
+# ABSOLUTE paths and hands them to the VM's docker daemon. The daemon can
+# only mount paths that exist ON THE VM. So the repo must live at the same
+# absolute path in both places: /opt/branch-as-code.
+#   sudo mkdir -p /opt/branch-as-code && sudo chown $USER:$USER /opt/branch-as-code
+#   git clone <repo> /opt/branch-as-code
+services:
+  dev:
+    build:
+      context: ..
+      dockerfile: dev/Dockerfile.dev
+    image: branch-as-code-dev:latest
+    container_name: dev-ide
+    privileged: true
+    pid: host
+    ports:
+      - "8443:8080"                    # code-server
+    environment:
+      PASSWORD: changeme               # code-server login — CHANGE THIS
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock   # control-plane socket
+      - /opt/branch-as-code:/opt/branch-as-code     # same path both sides!
+      - dev-ide-home:/root             # persist extensions, settings, history
+    restart: unless-stopped
+
+volumes:
+  dev-ide-home:

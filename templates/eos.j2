@@ -1,0 +1,50 @@
+! ============================================================
+! Golden config: {{ device.name }} ({{ device.role }} / {{ device.platform }})
+! Rendered by branch-as-code from {{ sot_source | default('netbox') }}
+! Site: {{ site_slug | default('branch-001') }} — store_id {{ store_id }}
+! Do not edit by hand: change the data, re-render, redeploy.
+! ============================================================
+hostname {{ device.name }}
+!
+username admin privilege 15 secret admin
+!
+spanning-tree mode mstp
+!
+{% for v in vlans | sort(attribute='vid') %}
+vlan {{ v.vid }}
+   name {{ v.name | upper }}
+{% endfor %}
+!
+ip routing
+!
+{% for i in interfaces %}
+interface {{ i.name }}
+   description {{ i.description | default('') }}
+{%- if i.name.startswith('Ethernet') %}
+{%- if i.mode == 'tagged' %}
+   switchport mode trunk
+   switchport trunk allowed vlan {{ i.tagged_vlans | join(',') }}
+{%- elif i.mode == 'access' %}
+   switchport mode access
+   switchport access vlan {{ i.untagged_vlan }}
+{%- elif i.ips %}
+   no switchport
+{%- endif %}
+{%- endif %}
+{%- for ip in i.ips | default([]) %}
+   ip address {{ ip }}
+{%- if i.name == 'Vlan20' and dhcp_helper is defined %}
+   ip helper-address {{ dhcp_helper }}
+{%- endif %}
+{%- endfor %}
+!
+{% endfor %}
+{% if default_gateway is defined %}
+ip route 0.0.0.0/0 {{ default_gateway }}
+!
+{% endif %}
+management api http-commands
+   protocol http
+   no shutdown
+!
+end

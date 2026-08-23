@@ -1,0 +1,87 @@
+# branch-as-code — reference branch topology ("Store #001")
+#
+# Design goals:
+#   - Fits on a 4-core / 16GB laptop alongside NetBox (~5-6GB total)
+#   - cEOS gives a Cisco-like CLI for the switching story (free download,
+#     requires a free arista.com account — see README "Getting cEOS")
+#   - FRR covers routing/BGP at ~100MB per node
+#
+# Baseline configs are bind-mounted from ../configs/<node>/ so the lab
+# comes up configured. The Ansible render playbook regenerates those same
+# files from NetBox — that before/after IS the demo.
+
+name: branch-001
+
+topology:
+  nodes:
+    # --- HQ / provider side -------------------------------------------
+    hq-core:
+      kind: linux
+      image: quay.io/frrouting/frr:10.2.6   # ~100MB RAM
+      binds:
+        - ../configs/hq-core/daemons:/etc/frr/daemons
+        - ../configs/hq-core/frr.conf:/etc/frr/frr.conf
+        - ../configs/hq-core/vtysh.conf:/etc/frr/vtysh.conf
+
+    # --- Store edge ----------------------------------------------------
+    rtr1-edge:
+      kind: linux
+      image: quay.io/frrouting/frr:10.2.6   # ~100MB RAM
+      binds:
+        - ../configs/rtr1-edge/daemons:/etc/frr/daemons
+        - ../configs/rtr1-edge/frr.conf:/etc/frr/frr.conf
+        - ../configs/rtr1-edge/vtysh.conf:/etc/frr/vtysh.conf
+
+    # --- Store switching ------------------------------------------------
+    sw1:
+      kind: ceos                            # ~1.5GB RAM
+      image: ceos:4.33.1F                   # import once, see README
+      binds:
+        - ../configs/sw1/startup-config:/mnt/flash/startup-config
+
+    sw2:
+      kind: ceos                            # ~1.5GB RAM
+      image: ceos:4.33.1F
+      binds:
+        - ../configs/sw2/startup-config:/mnt/flash/startup-config
+
+    # --- Endpoints ------------------------------------------------------
+    host-staff:
+      kind: linux
+      image: alpine:3.20                    # ~10MB RAM
+      exec:
+        - ip addr add 10.1.1.10/24 dev eth1
+        - ip route replace default via 10.1.1.1
+
+    host-guest:
+      kind: linux
+      image: alpine:3.20
+      exec:
+        - ip addr add 10.1.2.10/24 dev eth1
+        - ip route replace default via 10.1.2.1
+
+    host-pos:
+      kind: linux
+      image: alpine:3.20
+      exec:
+        - ip addr add 10.1.3.10/24 dev eth1
+        - ip route replace default via 10.1.3.1
+
+    # --- Roadmap node (centralized DHCP for the DHCP-relay demo) --------
+    # svc-dhcp:
+    #   kind: linux
+    #   image: quay.io/frrouting/frr:10.2.6   # or a dnsmasq image
+    #   exec:
+    #     - apk add dnsmasq ...
+
+  links:
+    # WAN: store edge -> HQ (eBGP over /31, CGNAT range as pseudo-WAN)
+    - endpoints: ["hq-core:eth1", "rtr1-edge:eth1"]
+    # Routed handoff edge -> L3 switch
+    - endpoints: ["rtr1-edge:eth2", "sw1:eth1"]
+    # Access trunk
+    - endpoints: ["sw1:eth2", "sw2:eth2"]
+    # Endpoints
+    - endpoints: ["sw1:eth3", "host-staff:eth1"]
+    - endpoints: ["sw2:eth3", "host-guest:eth1"]
+    - endpoints: ["sw2:eth4", "host-pos:eth1"]

@@ -1,0 +1,9 @@
+# netbox.netbox collection for dynamic inventory + lookups
+# arista.eos for config push / verification over eAPI
+collections:
+  - name: netbox.netbox
+    version: ">=3.14.0"
+  - name: arista.eos
+    version: ">=6.0.0"
+  - name: community.general
+    version: ">=8.0.0"

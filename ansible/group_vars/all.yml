@@ -1,0 +1,8 @@
+# Shared across inventories and roles.
+store_id: 1                      # single-store lab; multi-store derives from site slug
+sot_source: netbox               # static inventory overrides this per-host
+configs_dir: "{{ playbook_dir }}/../configs"
+
+# NetBox API (only used when sot_source == 'netbox')
+netbox_url: "{{ lookup('env', 'NETBOX_URL') | default('http://localhost:8000', true) }}"
+netbox_token: "{{ lookup('env', 'NETBOX_TOKEN') | default('', true) }}"
