@@ -124,7 +124,7 @@ Every serious network-automation lab does this dance.
     └── host-and-toolchain.md          # Windows -> VMware -> Ubuntu VM -> containers
 ```
 
-## Roadmap (deliberate next steps, each a talking point)
+## Roadmap (deliberate next steps)
 
 - [ ] `svc-dhcp` node + `ip helper-address` — centralized DHCP, NetBox as IPAM
 - [ ] Meraki dashboard API module — cloud-managed WLAN profile from the same SoT
