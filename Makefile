@@ -34,5 +34,5 @@ verify: ## Run post-change verification
 netbox-up: ## Start NetBox (expects netbox-docker clone in ../netbox-docker)
 	cd ../netbox-docker && docker compose up -d
 
-populate: ## Populate NetBox with the Store 001 data model
+populate: ## Populate NetBox with the branch-001 data model
 	python3 scripts/netbox_populate.py
