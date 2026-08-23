@@ -1,6 +1,6 @@
 # branch-as-code
 
-**How I would standardize 5 000 branch sites: one reference store, fully
+**How I would standardize 5 000 branch sites: one reference branch, fully
 data-driven, rendered from a Source of Truth, deployed and verified by
 Ansible, running as a lightweight Containerlab topology on a laptop.**
 
