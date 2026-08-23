@@ -97,25 +97,25 @@
     97	| **Total** | | | | **≈ 6 GB** |
     98	
     99	Leaves headroom for the OS and an IDE. Free-alternative swap if you want
-   100	to skip the Arista download: replace cEOS with Nokia SR Linux
-   101	(`ghcr.io/nokia/srlinux`, free to pull, ~1 GB) — only `templates/eos.j2`
-   102	and two lines of the topology change.
-   103	
-   104	## Getting the cEOS image (the only non-trivial prerequisite)
-   105	
-   106	cEOS is free but gated behind a (free) arista.com account:
-   107	
-   108	1. Register at arista.com → *Software Downloads* → cEOS-lab → download
-   109	   `cEOS64-lab-4.33.1F.tar`
-   110	2. `docker import cEOS64-lab-4.33.1F.tar ceos:4.33.1F`
-   111	
-   112	The download is a plain `.tar` (earlier cEOS releases shipped as `.tar.xz`) —
-   113	`docker import` handles both transparently. The important thing is that the
-   114	tag (`ceos:4.33.1F`) matches the `image:` lines in
-   115	`containerlab/branch-001.clab.yml`.
-   116	
-   117	## Repo map
-   118	
+    100	to skip the Arista download: replace cEOS with Nokia SR Linux
+    101	(`ghcr.io/nokia/srlinux`, free to pull, ~1 GB) — only `templates/eos.j2`
+    102	and two lines of the topology change.
+    103	
+    104	## Getting the cEOS image (the only non-trivial prerequisite)
+    105	
+    106	cEOS is free but gated behind a (free) arista.com account:
+    107	
+    108	1. Register at arista.com → *Software Downloads* → cEOS-lab → download
+    109	   `cEOS64-lab-4.33.1F.tar`
+    110	2. `docker import cEOS64-lab-4.33.1F.tar ceos:4.33.1F`
+    111	
+    112	The download is a plain `.tar` (earlier cEOS releases shipped as `.tar.xz`) —
+    113	`docker import` handles both transparently. The important thing is that the
+    114	tag (`ceos:4.33.1F`) matches the `image:` lines in
+    115	`containerlab/branch-001.clab.yml`.
+    116	
+    117	## Repo map
+    118	
    119	```
    120	├── containerlab/branch-001.clab.yml   # the reference store topology
    121	├── configs/                           # golden configs (bind-mounted into nodes)
