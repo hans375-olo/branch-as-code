@@ -116,7 +116,7 @@
     116	
     117	## Repo map
     118	
-   119	```
+    119	```
    120	├── containerlab/branch-001.clab.yml   # the reference store topology
    121	├── configs/                           # golden configs (bind-mounted into nodes)
    122	│   ├── hq-core/  rtr1-edge/  sw1/  sw2/
