@@ -120,7 +120,7 @@ Every serious network-automation lab does this dance.
 │   ├── Dockerfile.dev
 │   └── docker-compose.dev.yml
 └── docs/
-    ├── design-decisions.md            # the why — read this before the interview
+    ├── design-decisions.md            # the why — as the name says
     └── host-and-toolchain.md          # Windows -> VMware -> Ubuntu VM -> containers
 ```
 
