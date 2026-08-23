@@ -6,4 +6,3 @@ ansible_httpapi_use_ssl: false
 ansible_httpapi_port: 80
 ansible_user: admin
 ansible_password: admin        # cEOS-lab default; set a real one if your image requires it
-real estate: Ansible Vault
