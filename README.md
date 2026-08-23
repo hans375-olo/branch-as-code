@@ -94,8 +94,7 @@ cEOS is free but gated behind a (free) arista.com account:
    `cEOS64-lab-4.33.0F.tar.xz`
 2. `docker import cEOS64-lab-4.33.0F.tar.xz ceos:4.33.0F`
 
-Every serious network-automation lab does this dance; showing you know it
-is itself a talking point.
+Every serious network-automation lab does this dance.
 
 ## Repo map
 
