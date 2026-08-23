@@ -117,37 +117,37 @@
     117	## Repo map
     118	
     119	```
-   120	├── containerlab/branch-001.clab.yml   # the reference store topology
-   121	├── configs/                           # golden configs (bind-mounted into nodes)
-   122	│   ├── hq-core/  rtr1-edge/  sw1/  sw2/
-   123	├── netbox/data-model.md               # the data model, in words and tables
-   124	├── scripts/netbox_populate.py         # idempotent NetBox builder (pynetbox)
-   125	├── templates/                         # Jinja2 golden-config templates per platform
-   126	│   ├── eos.j2
-   127	│   └── frr.j2
-   128	├── ansible/
-   129	│   ├── render.yml                     # SoT -> normalized contract -> template -> configs/
-   130	│   ├── deploy.yml                     # eAPI config replace (EOS), vtysh reload (FRR)
-   131	│   ├── verify.yml                     # state collection + BGP assertion + e2e pings
-   132	│   ├── inventories/
-   133	│   │   ├── netbox.yml                 # dynamic inventory from NetBox
-   134	│   │   └── static/                    # zero-infra fallback SoT (same contract!)
-   135	│   └── group_vars/                    # routing policy + platform connection vars
-   136	├── dev/                               # the workstation container (code-server IDE,
-   137	│   │                                  # Python, Ansible, pyATS, containerlab, docker CLI)
-   138	│   ├── Dockerfile.dev
-   139	│   └── docker-compose.dev.yml
-   140	└── docs/
-   141	    ├── design-decisions.md            # design rationale and trade-offs
-   142	    └── host-and-toolchain.md          # Windows -> VMware -> Ubuntu VM -> containers
-   143	```
-   144	
-   145	## Roadmap
-   146	
-   147	- [ ] `svc-dhcp` node + `ip helper-address` — centralized DHCP, NetBox as IPAM
-   148	- [ ] Meraki dashboard API module — cloud-managed WLAN profile from the same SoT
-   149	- [ ] FortiGate/HP template — proving vendor extensibility of the contract
-   150	- [ ] CI with GitHub Actions: render + batfish/pyntc validation on every PR
-   151	- [ ] Guest VRF + segmentation policy
-   152	- [ ] `--store-id 2` run of `netbox_populate.py` — the scaling demo, live
-   153	
+    120	├── containerlab/branch-001.clab.yml   # the reference store topology
+    121	├── configs/                           # golden configs (bind-mounted into nodes)
+    122	│   ├── hq-core/  rtr1-edge/  sw1/  sw2/
+    123	├── netbox/data-model.md               # the data model, in words and tables
+    124	├── scripts/netbox_populate.py         # idempotent NetBox builder (pynetbox)
+    125	├── templates/                         # Jinja2 golden-config templates per platform
+    126	│   ├── eos.j2
+    127	│   └── frr.j2
+    128	├── ansible/
+    129	│   ├── render.yml                     # SoT -> normalized contract -> template -> configs/
+    130	│   ├── deploy.yml                     # eAPI config replace (EOS), vtysh reload (FRR)
+    131	│   ├── verify.yml                     # state collection + BGP assertion + e2e pings
+    132	│   ├── inventories/
+    133	│   │   ├── netbox.yml                 # dynamic inventory from NetBox
+    134	│   │   └── static/                    # zero-infra fallback SoT (same contract!)
+    135	│   └── group_vars/                    # routing policy + platform connection vars
+    136	├── dev/                               # the workstation container (code-server IDE,
+    137	│   │                                  # Python, Ansible, pyATS, containerlab, docker CLI)
+    138	│   ├── Dockerfile.dev
+    139	│   └── docker-compose.dev.yml
+    140	└── docs/
+    141	    ├── design-decisions.md            # design rationale and trade-offs
+    142	    └── host-and-toolchain.md          # Windows -> VMware -> Ubuntu VM -> containers
+    143	```
+    144	
+    145	## Roadmap
+    146	
+    147	- [ ] `svc-dhcp` node + `ip helper-address` — centralized DHCP, NetBox as IPAM
+    148	- [ ] Meraki dashboard API module — cloud-managed WLAN profile from the same SoT
+    149	- [ ] FortiGate/HP template — proving vendor extensibility of the contract
+    150	- [ ] CI with GitHub Actions: render + batfish/pyntc validation on every PR
+    151	- [ ] Guest VRF + segmentation policy
+    152	- [ ] `--store-id 2` run of `netbox_populate.py` — the scaling demo, live
+    153	
