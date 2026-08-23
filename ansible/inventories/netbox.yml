@@ -1,0 +1,26 @@
+# Dynamic inventory: NetBox is the Source of Truth.
+#
+#   export NETBOX_URL=http://localhost:8000
+#   export NETBOX_TOKEN=<token>
+#   ansible-inventory -i inventories/netbox.yml --graph
+#
+# Devices are grouped by their NetBox device-role slug
+# (wan-edge / dist-switch / access-switch) and platform (eos / frr),
+# so the same group_vars drive both inventories.
+plugin: netbox.netbox.nb_inventory
+api_endpoint: "{{ lookup('env', 'NETBOX_URL') }}"
+token: "{{ lookup('env', 'NETBOX_TOKEN') }}"
+validate_certs: false
+
+# One branch in this lab; multi-branch would compose store_id from the
+# site slug / a custom field (see docs/design-decisions.md).
+site: branch-001
+
+group_by:
+  - device_roles
+  - platforms
+
+compose:
+  # containerlab registers node names in the docker host's /etc/hosts
+  ansible_host: '"clab-branch-001-" + name'
+  store_id: 1
