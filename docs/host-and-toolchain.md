@@ -51,7 +51,7 @@ sudo usermod -aG docker $USER   # re-login after this
 # Repo at the canonical path (see the path rule in dev/docker-compose.dev.yml)
 sudo mkdir -p /opt/branch-as-code
 sudo chown $USER:$USER /opt/branch-as-code
-git clone <your-repo-url> /opt/branch-as-code
+git clone https://github.com/hans375-olo/branch-as-code /opt/branch-as-code
 
 # Build + start the workstation container
 cd /opt/branch-as-code
@@ -88,7 +88,7 @@ extension (`srl-labs.vscode-containerlab`) isn't found there, grab the VSIX
 from the GitHub releases page of the extension and install via the
 code-server UI (*Extensions → ... → Install from VSIX*).
 
-### Alternative worth knowing (and a fine interview nuance)
+### Alternative worth knowing (and a fine nuance)
 
 VS Code on Windows → *Remote-SSH* into the VM → *Dev Containers* into
 `dev-ide` gives the full desktop VS Code experience with the same container.
@@ -112,5 +112,4 @@ pyATS/Genie is installed in the container. The natural evolution of
 `verify.yml`: replace the FRR JSON parsing and EOS text checks with Genie
 parsers (`genie parse "show ip interface brief" ...`) and a pyATS testbed
 YAML — structured state diffing ("did this change break anything?") is
-exactly what pyATS is for, and it's a Cisco-ecosystem signal that lands
-well with a Cisco-partner MSP.
+exactly what pyATS is for.

@@ -1,6 +1,6 @@
-# Design decisions — read this before the interview
+# Design decisions
 
-Every choice in this repo answers a question an interviewer is likely to ask.
+Every choice in this repo answers a question an interested party is likely to ask.
 This doc pairs the decision with the answer.
 
 ## "Why NetBox — and why does the lab also work without it?"
@@ -48,7 +48,7 @@ than a parenthesis, because it's the obvious challenger:
 ### Why NetBox over Nautobot, specifically
 
 - **Market signal.** NetBox is the name that appears in job postings and the
-  SoT most network teams — MSPs included — actually recognize. For a
+  SoT most network teams actually recognize. For a
   portfolio whose job is to start conversations, recognition matters.
 - **Time-to-demo.** The `netbox-docker` + `nb_inventory` + `pynetbox` path
   is the most documented stack in network automation. More examples to stand
@@ -79,21 +79,21 @@ than a parenthesis, because it's the obvious challenger:
   instead of screen-scraping SSH.
 - **FRR** at ~100 MB per node covers routing/BGP where a Cisco CLI adds
   nothing.
-- Honest answer for Simac: *"For IOS XE-specific behavior I'd keep the CML
+- Honest answer: *"For IOS XE-specific behavior I'd keep the CML
   lab I already have; for a portable standardization demo, cEOS/FRR is the
   right trade."*
 
-## "How does this scale to 5 000 stores?"
+## "How does this scale to 5 000 branches?"
 
 Three mechanisms, all demonstrable:
 
-1. **Addressing algebra**: store *N* = `10.N.0.0/20`, VLANs are global
-   constants. The store's entire IPAM is a function of one integer.
-2. **The populate script takes `--store-id`**. Store #002 is a command, not
-   a project. (Running `python3 scripts/netbox_populate.py --store-id 2`
-   live in an interview is the money shot.)
-3. **Templates are store-agnostic**: they consume whatever the SoT says.
-   Adding a store adds zero template code.
+1. **Addressing algebra**: branch *N* = `10.N.0.0/20`, VLANs are global
+   constants. The branch's entire IPAM is a function of one integer.
+2. **The populate script takes `--branch-id`**. Branch #002 is a command, not
+   a project. (Running `python3 scripts/netbox_populate.py --branch-id 2`
+   can be done in a live demo.)
+3. **Templates are branch-agnostic**: they consume whatever the SoT says.
+   Adding a branch adds zero template code.
 
 ## "How do you deploy safely?"
 
@@ -105,7 +105,7 @@ Three mechanisms, all demonstrable:
   checks, a parsed JSON assertion that eBGP is `Established`, and
   end-to-end pings across every layer of the path.
 
-## "Where do Meraki and Fortinet fit?"
+## "Where would Meraki and Fortinet fit?"
 
 - **Meraki**: cloud-managed — the SoT stays NetBox, but the *deploy* step
   targets the Meraki Dashboard API instead of a device CLI. Same data,
@@ -114,10 +114,10 @@ Three mechanisms, all demonstrable:
   NetBox. The contract (device/vlans/interfaces) already carries everything
   a FortiGate branch profile needs for L2/L3 handoff.
 
-## Known limitations (say them before they ask)
+## Known limitations
 
 - One IP per interface in the normalization logic (fine for this model;
   noted in `render.yml`).
 - No secrets management yet — that's Vault/SOPS, next iteration.
 - hq-core is deliberately **not** managed: it's the "provider". The SoT
-  scopes your own estate, which is itself a design boundary worth naming.
+  scopes your own estate, which is itself a design boundary.

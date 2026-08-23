@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Populate NetBox with the Store #001 data model.
+Populate NetBox with the Branch #001 data model.
 
 Idempotent: uses get-or-create on natural keys, safe to re-run.
 
@@ -16,7 +16,7 @@ import sys
 
 import pynetbox
 
-STORE_OCTET_BASE = 10  # 10.<store-id>.0.0/20
+STORE_OCTET_BASE = 10  # 10.<branch-id>.0.0/20
 
 VLANS = [
     (10, "MGMT", "branch-mgmt", 0),

@@ -1,29 +1,29 @@
 # NetBox data model — Branch #001
 
-The model is designed so that **one store is data, not configuration**.
-Adding store #002 = re-running the populate script with a different site
+The model is designed so that **one branch is data, not configuration**.
+Adding branch #002 = re-running the populate script with a different site
 code. The Jinja2 templates never change.
 
 ## Addressing plan (the scaling story)
 
 ```
 10.0.0.0/8                    container: "Branch network"
-├── 10.<store>.0.0/20         per store   (store 1 -> 10.1.0.0/20)
-│   ├── 10.<store>.0.0/24     VLAN 10  MGMT
-│   ├── 10.<store>.1.0/24     VLAN 20  STAFF
-│   ├── 10.<store>.2.0/24     VLAN 30  GUEST
-│   ├── 10.<store>.3.0/24     VLAN 40  POS
-│   └── 10.<store>.255.0/31   transit: rtr-edge <-> sw1
+├── 10.<branch>.0.0/20         per branch   (branch 1 -> 10.1.0.0/20)
+│   ├── 10.<branch>.0.0/24     VLAN 10  MGMT
+│   ├── 10.<branch>.1.0/24     VLAN 20  STAFF
+│   ├── 10.<branch>.2.0/24     VLAN 30  GUEST
+│   ├── 10.<branch>.3.0/24     VLAN 40  POS
+│   └── 10.<branch>.255.0/31   transit: rtr-edge <-> sw1
 ├── 10.255.0.0/16             infra loopbacks (router-IDs)
-└── 100.64.1.0/31             WAN link store-001 <-> HQ (lab pseudo-WAN)
+└── 100.64.1.0/31             WAN link branch-001 <-> HQ (lab pseudo-WAN)
 ```
 
-A /20 per store from 10/8 gives 4 096 stores per /8 block — plus the rest
-of RFC1918 behind it. Store number = second octet, so the prefix *is* the
-store identity (ops can read a store ID straight out of a traceroute).
+A /20 per branch from 10/8 gives 4 096 branches per /8 block — plus the rest
+of RFC1918 behind it. Branch number = second octet, so the prefix *is* the
+branch identity (ops can read a branch ID straight out of a traceroute).
 
 VLAN IDs are **global constants** (10/20/30/40 mean the same thing in every
-store); only the prefixes change. That is what makes one template serve
+branch); only the prefixes change. That is what makes one template serve
 5 000 sites.
 
 ## Object tree
@@ -37,7 +37,7 @@ store); only the prefixes change. That is what makes one template serve
 | Platform | `eos` (napalm driver eos), `frr` | drives template + Ansible collection selection |
 | Device role | `wan-edge`, `dist-switch`, `access-switch` | drives Ansible grouping |
 | Devices | `rtr1-edge` (wan-edge/frr), `sw1` (dist-switch/eos), `sw2` (access-switch/eos) | |
-| VLAN group | `store-001-vlans` (scope: site) | VID 10/20/30/40 |
+| VLAN group | `branch-001-vlans` (scope: site) | VID 10/20/30/40 |
 | Prefixes | per table above, roles: `branch-mgmt`, `branch-user`, `branch-guest`, `branch-pos`, `transit`, `infra` | |
 | VRF | `default` only | guest VRF is a roadmap item |
 | Interfaces | routed / access / tagged (802.1q mode set per interface) | see below |
@@ -62,7 +62,7 @@ The Ansible render playbook reads exactly these fields
 (`mode.value`, `untagged_vlan.vid`, `tagged_vlans[].vid`, assigned IPs) —
 nothing in the templates is hard-coded.
 
-## What deliberately stays out (interview answers, not gaps)
+## What deliberately stays out
 
 - **Secrets**: NetBox keeps the data model; secrets belong in Vault/SOPS.
 - **Wireless APs**: Meraki is API-managed; modeled here as a future
